@@ -40,7 +40,6 @@ def get_step(parents, start, node):
 
 # BFS algorithm
 def search(grid, start):
-    global STEP
     sr,sc = start
     queue = [start]
     visited = [start]
@@ -71,7 +70,6 @@ def search_loop(queue, grid, visited, distance, parents, start):
     return search_loop(queue, grid, visited, distance, parents, start)
     
 def get_dir(grid,start):
-    global STEP
     dir = search(grid,start)
     if(dir == (-1,-1)):
         return search(grid,start)
