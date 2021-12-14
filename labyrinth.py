@@ -1,6 +1,7 @@
 """
 A non optimal (87% validation) solution for Codingame's labyrinth puzzle.
 Using Breadth-First Search graph exploration.
+WIP
 """
 
 import sys
@@ -32,46 +33,42 @@ def get_childs(node, grid):
 
 def get_step(parents, start, node):
     y,x = node
-    while(parents[y][x] != start):
-        y,x = parents[y][x]
-    return (y,x)
+    if(parents[y][x] != start):
+        return get_step(parents, start, parents[y][x])
+    else :
+        return (y,x)
 
 # BFS algorithm
 def search(grid, start):
     global STEP
     sr,sc = start
-    queue = []
-    visited = []
-    distance = []
-    parents = []
-    queue.append(start)
-
-    for y in range(len(grid)):
-        distance.append([])
-        parents.append([])
-        for x in range(len(grid[y])):
-            distance[y].append(float('inf'))
-            parents[y].append((-1,-1))
+    queue = [start]
+    visited = [start]
+    distance = [[float('inf') for i in range(len(grid[j]))] for j in range(len(grid))]
+    parents = [[(-1,-1) for i in range(len(grid[j]))] for j in range(len(grid))]
     distance[sr][sc] = 0
-    visited.append(start)
+    return search_loop(queue, grid, visited, distance, parents, start)
 
-    while(len(queue) > 0):
+def search_loop(queue, grid, visited, distance, parents, start):
+    if(queue == []):
+        return (-1,-1)
+    else :
         s = queue.pop(0)
         childs = get_childs(s,grid)
         if( STEP ):
-            childs = [(y,x) for (y,x) in childs if (grid[y][x] != 'C')]
+            childs = [(y,x) for (y,x) in childs if (grid[y][x] != 'C')] #leave CTRL room
+        childs = [x for x in childs if x not in visited]
         for i in childs:
-            if i not in visited:
-                queue.append(i)
-                visited.append(i)
-                y,x = i
-                parents[y][x] = (s)
-                if(not STEP):
-                    if(grid[y][x] == '?' or grid[y][x] == 'C'):
-                        return get_step(parents,start,i)
-                elif(STEP and grid[y][x] == 'T'):
+            queue.append(i)
+            visited.append(i)
+            y,x = i
+            parents[y][x] = (s)
+            if(not STEP):
+                if(grid[y][x] == '?' or grid[y][x] == 'C'):
                     return get_step(parents,start,i)
-    return (-1,-1)
+            elif(STEP and grid[y][x] == 'T'):
+                return get_step(parents,start,i)
+    return search_loop(queue, grid, visited, distance, parents, start)
     
 def get_dir(grid,start):
     global STEP
