@@ -31,48 +31,43 @@ def get_childs(node, grid):
     l = [(y,x) for (y,x) in l if (y > 0 and y < r and x > 0 and x < c)]    # Filtering out out-of-grid coordinates
     return [(y,x) for (y,x) in l if (grid[y][x] != '#')]                   # Filtering out obstacles
 
-def get_step(parents, start, node):
+def go_to(parents, currentNode, node):
     y,x = node
-    if(parents[y][x] != start):
-        return get_step(parents, start, parents[y][x])
+    if(parents[y][x] != currentNode):
+        return go_to(parents, currentNode, parents[y][x])
     else :
         return (y,x)
 
 # BFS algorithm
-def search(grid, start):
-    sr,sc = start
-    queue = [start]
-    visited = [start]
-    distance = [[float('inf') for i in range(len(grid[j]))] for j in range(len(grid))]
+def search(grid, currentNode):
+    sr,sc = currentNode
+    queue = [currentNode]
+    visited = [currentNode]
     parents = [[(-1,-1) for i in range(len(grid[j]))] for j in range(len(grid))]
-    distance[sr][sc] = 0
-    return search_loop(queue, grid, visited, distance, parents, start)
+    return search_loop(queue, grid, visited, parents, currentNode)
 
-def search_loop(queue, grid, visited, distance, parents, start):
+def search_loop(queue, grid, visited, parents, currentNode):
     if(queue == []):
         return (-1,-1)
     else :
         s = queue.pop(0)
         childs = get_childs(s,grid)
-        if( STEP ):
-            childs = [(y,x) for (y,x) in childs if (grid[y][x] != 'C')] #leave CTRL room
         childs = [x for x in childs if x not in visited]
-        for i in childs:
-            queue.append(i)
-            visited.append(i)
-            y,x = i
+        for (y,x) in childs:
+            queue.append((y,x))
+            visited.append((y,x))
             parents[y][x] = (s)
             if(not STEP):
-                if(grid[y][x] == '?' or grid[y][x] == 'C'):
-                    return get_step(parents,start,i)
+                if(grid[y][x] == 'C' or grid[y][x] == '?'):
+                    return go_to(parents,currentNode,(y,x))
             elif(STEP and grid[y][x] == 'T'):
-                return get_step(parents,start,i)
-    return search_loop(queue, grid, visited, distance, parents, start)
+                return go_to(parents,currentNode,(y,x))
+    return search_loop(queue, grid, visited, parents, currentNode)
     
-def get_dir(grid,start):
-    dir = search(grid,start)
+def get_dir(grid,currentNode):
+    dir = search(grid,currentNode)
     if(dir == (-1,-1)):
-        return search(grid,start)
+        return search(grid,currentNode)
     return dir
 
 # game loop
