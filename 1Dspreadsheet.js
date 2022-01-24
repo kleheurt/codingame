@@ -12,13 +12,13 @@ for (let i = 0; i < N; i++) {
 /** Solution */
 // main processing loop
 for (let i = 0; i < N; i++) {
-    let x = parser_memo(inputs,i);
+    let x = parserMemo(inputs,i);
     if(x == 0) console.log(0);
     else console.log(x);
 }
 
 // memory of already computed values
-function parser_memo(arr,pos){
+function parserMemo(arr,pos){
     console.error(arr[pos]);
     if(arr[pos][0] == 'DONE') return arr[pos][1];
     else{
@@ -44,7 +44,7 @@ function parser(arr, pos){
 
 // links extraction
 function extr(arr,pos,pos2){
-    if(arr[pos][pos2].charAt(0) == '$') return parser_memo(arr,parseInt(arr[pos][pos2].substring(1)));
+    if(arr[pos][pos2].charAt(0) == '$') return parserMemo(arr,parseInt(arr[pos][pos2].substring(1)));
     else return safeParseInt(arr[pos][pos2]);
 }
 
